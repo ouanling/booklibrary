@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>Library app</title>
+  </head>
+
+  <body>
+    <div class="tablecontainer"></div>
+    <table id="myTable" style="width:800px">
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Number of Pages</th>
+        <th>been read?</th>
+      </tr>
+    </table>
+
+    <script>
+      let myLibrary = [];
+      const tableVar = document.getElementById("myTable");
+      function Book(title, author, nb_page, read) {
+        this.title = title;
+        this.author = author;
+        this.nb_page = nb_page;
+        this.read = read;
+        this.info = function() {
+          if (this.read == "yes") {
+            str = ` ${this.title} , by:  ${this.author} ,  ${this.nb_page}  pages. Have read it`;
+            return str;
+          } else {
+            str = ` ${this.title} , by:  ${this.author} ,  ${this.nb_page}  pages. Have not read it yet`;
+            return str;
+          }
+        };
+      }
+      function addBookToLibrary(book) {
+        myLibrary.push(book);
+      }
+      function render(library) {
+        let nbofrow = library.length;
+        console.log(nbofrow);
+        var p = 0;
+        var i;
+        for (i = 1; i < nbofrow + 1; i++) {
+          createRow(i,p);
+          p++;
+          }
+
+       
+      }
+      function createRow(nbrow,booknb) {
+        var rowtoprint = tableVar.insertRow(nbrow);
+        var arr = Object.values(myLibrary[booknb]);
+        var z;
+          for (z = 0; z < 4; z++) {
+            console.log('var z' + z);
+            var cell = rowtoprint.insertCell(z);
+            console.log(cell);
+            cell.innerHTML = arr[z];
+          }
+      }
+
+      const hobbit = new Book("The Hobbit", "J.R.R Tolkien", "295", "no");
+      const got = new Book("Game Of Thrones", "George RR martin", "600", "yes");
+      addBookToLibrary(hobbit);
+      addBookToLibrary(got);
+    </script>
+  </body>
+</html>
