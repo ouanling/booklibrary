@@ -5,68 +5,251 @@
     <meta charset="utf-8" />
 
     <title>Library app</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #180949;
+        color: #dddddd;
+      }
+      .rowcolor1 {
+        background-color: #7b70a1;
+        color: #dddddd;
+      }
+
+      .tablecontainer {
+        overflow-x: auto;
+        display: flex;
+        justify-content: center;
+      }
+      .rowcolor2 {
+        background-color: #403075;
+        color: #dddddd;
+      }
+      .readtoggle {
+        display: flex;
+        justify-content: center;
+        background-color: #7fdbff;
+        color: black;
+        border-radius: 100px;
+        opacity: 0.8;
+      }
+      .readtoggle:hover {
+        opacity: 0.5;
+      }
+      .fa {
+        display: flex;
+        justify-content: right;
+        height: 25px;
+        padding-top: 5px;
+      }
+      .fa:hover {
+        opacity: 0.5;
+      }
+
+      .addbookbtn {
+        background-color: #d3d2d7;
+        color: #111111;
+        padding: 16px 20px;
+        border: none;
+        cursor: pointer;
+        opacity: 0.8;
+        position: fixed;
+        bottom: 23px;
+        right: 28px;
+        width: 280px;
+      }
+      .form-popup {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        right: 15px;
+        border: 3px solid white;
+        z-index: 9;
+      }
+      .form-container {
+        max-width: 300px;
+        padding: 10px;
+        background-color: white;
+        color: black;
+      }
+      .form-container input[type="text"],
+      .form-container input[type="number"] {
+        width: 100%;
+        padding: 15px;
+        margin: 5px 0 22px 0;
+        border: none;
+        background: #f1f1f1;
+      }
+      .form-container input[type="text"]:focus,
+      .form-container input[type="number"]:focus {
+        background-color: #ddd;
+        outline: none;
+      }
+      .form-container .btn {
+        background-color: #403075;
+        color: white;
+        padding: 16px 20px;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 10px;
+        opacity: 0.8;
+      }
+      .form-container .cancel {
+        background-color: red;
+      }
+      .form-container .btn:hover,
+      .open-button:hover {
+        opacity: 1;
+      }
+    </style>
   </head>
 
   <body>
-    <div class="tablecontainer"></div>
-    <table id="myTable" style="width:800px">
-      <tr>
-        <th>Title</th>
-        <th>Author</th>
-        <th>Number of Pages</th>
-        <th>been read?</th>
-      </tr>
-    </table>
+    <h1>ouanling's library</h1>
+    <div class="tablecontainer">
+      <table id="myTable" style="width:800px">
+        <tr>
+          <th class="rowcolor1">Title</th>
+          <th class="rowcolor2">Author</th>
+          <th class="rowcolor1">Number of Pages</th>
+          <th class="rowcolor2">been read?</th>
+        </tr>
+      </table>
+    </div>
+
+    <button class="addbookbtn" onclick="openForm()">Add a book</button>
+    <div class="form-popup" id="myForm">
+      <form
+        class="form-container"
+        onsubmit="addBook(addbutton.form.bookname.value,addbutton.form.bookauthor.value,addbutton.form.bookpages.value,addbutton.form.bookread.value); return false;"
+      >
+        <h1>Add a book</h1>
+
+        <label for="bookname"><b>Book name</b></label>
+        <input type="text" placeholder="Book Name" name="bookname" required />
+
+        <label for="bookauthor"><b>Author</b></label>
+        <input
+          type="text"
+          placeholder="Book Author"
+          name="bookauthor"
+          required
+        />
+
+        <label for="bookpages"><b>Number of pages</b></label>
+        <input
+          type="number"
+          placeholder="Number of pages"
+          name="bookpages"
+          required
+        />
+        <label for="bookread"><b>Have you read it?</b><br /></label>
+        <input type="radio" id="yes" name="bookread" value="Yes" required />
+        <label for="yes">Yes</label><br />
+        <input type="radio" id="no" name="bookread" value="No" />
+        <label for="no">No</label><br />
+
+        <button type="submit" id="addbtn" class="btn">Add your book</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">
+          Close
+        </button>
+      </form>
+    </div>
 
     <script>
       let myLibrary = [];
       const tableVar = document.getElementById("myTable");
+      const addbutton = document.getElementById("addbtn");
+      const delbtns = document.getElementsByClassName("fa fa-trash");
       function Book(title, author, nb_page, read) {
         this.title = title;
         this.author = author;
         this.nb_page = nb_page;
         this.read = read;
-        this.info = function() {
-          if (this.read == "yes") {
-            str = ` ${this.title} , by:  ${this.author} ,  ${this.nb_page}  pages. Have read it`;
-            return str;
+        this.toggleRead = function() {
+          if (this.read == "Yes") {
+            this.read = "No";
+            changeReadStatus(this);
           } else {
-            str = ` ${this.title} , by:  ${this.author} ,  ${this.nb_page}  pages. Have not read it yet`;
-            return str;
+            this.read = "Yes";
+            changeReadStatus(this);
           }
         };
       }
+      function changeReadStatus(valeur) {
+        render(myLibrary);
+      }
       function addBookToLibrary(book) {
         myLibrary.push(book);
+
+        render(myLibrary);
       }
       function render(library) {
+        clearTable();
+
         let nbofrow = library.length;
-        console.log(nbofrow);
         var p = 0;
         var i;
         for (i = 1; i < nbofrow + 1; i++) {
-          createRow(i,p);
+          createRow(i, p);
           p++;
-          }
-
-       
+        }
       }
-      function createRow(nbrow,booknb) {
+
+      function createRow(nbrow, booknb) {
         var rowtoprint = tableVar.insertRow(nbrow);
         var arr = Object.values(myLibrary[booknb]);
         var z;
-          for (z = 0; z < 4; z++) {
-            console.log('var z' + z);
-            var cell = rowtoprint.insertCell(z);
-            console.log(cell);
-            cell.innerHTML = arr[z];
-          }
+        for (z = 0; z < 4; z++) {
+          var cell = rowtoprint.insertCell(z);
+
+          cell.innerHTML = arr[z];
+        }
+        rowtoprint.insertCell(4).className = "fa fa-trash" + " " + nbrow;
+        let booktodel = nbrow - 1;
+        tableVar.rows[nbrow].cells[3].onclick = function() {
+          myLibrary[booktodel].toggleRead();
+        };
+        tableVar.rows[nbrow].cells[3].className = "readtoggle";
+        tableVar.rows[nbrow].cells[4].onclick = function() {
+          removeOneBook(booktodel);
+        };
       }
 
-      const hobbit = new Book("The Hobbit", "J.R.R Tolkien", "295", "no");
-      const got = new Book("Game Of Thrones", "George RR martin", "600", "yes");
+      function openForm() {
+        document.getElementById("myForm").style.display = "block";
+      }
+
+      function closeForm() {
+        document.getElementById("myForm").style.display = "none";
+      }
+      function addBook(name, author, pages, read) {
+        bk = new Book(name, author, pages, read);
+        addBookToLibrary(bk);
+      }
+      function clearTable() {
+        while (tableVar.rows.length > 1) {
+          tableVar.deleteRow(1);
+        }
+      }
+      function removeOneBook(bookline) {
+        delete myLibrary[bookline];
+        myLibrary = myLibrary.filter(function() {
+          return true;
+        });
+        render(myLibrary);
+      }
+      const hobbit = new Book("The Hobbit", "J.R.R Tolkien", "295", "No");
+      const got = new Book("Game Of Thrones", "George RR martin", "600", "Yes");
       addBookToLibrary(hobbit);
       addBookToLibrary(got);
+      render(myLibrary);
     </script>
   </body>
 </html>
